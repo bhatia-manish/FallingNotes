@@ -152,7 +152,7 @@ public class FallingNotesScreen implements Screen, InputProcessor {
         if (keycode == Input.Keys.SPACE) {
             isPlaying = !isPlaying;
             notes.printFinalList();
-            
+
         }
         if(keycode == Input.Keys.A)
         {
