@@ -13,14 +13,16 @@ public class PianoKey {
     float height;
     float width;
     Texture texture;
+    Texture upTexture;
+    Texture downTexture;
 
     Piano.PianoKeyType keyType;
     boolean isPressed = false;
     int group;
     int positionInGroup;
 
-    public PianoKey()
-    {
+    public PianoKey() {
+
 
     }
 
@@ -39,10 +41,14 @@ public class PianoKey {
         this.positionInGroup = group;
 
         if (keyType == Piano.PianoKeyType.BLACK) {
-            this.texture = new Texture("black_up.png");
+            this.texture = new Texture("piano/black_up.png");
+            this.upTexture = new Texture("piano/black_up.png");
+            this.downTexture = FallingNotesScreen.getTheme().getBlackKeyDownTexture();
 
         } else {
             this.texture = new Texture("white_up.png");
+            this.upTexture = new Texture("white_up.png");
+            this.downTexture = FallingNotesScreen.getTheme().getWhiteKeyDownTexture();
 
 
         }
@@ -56,7 +62,7 @@ public class PianoKey {
         keySprite.setSize(width, height);
         keySprite.setRegion(texture);
         keySprite.draw(batch);
-    }
+        }
 
     float getHeight() {
         return this.height;
@@ -143,25 +149,37 @@ public class PianoKey {
     void updateTextureUp()
     {
 
-//        Gdx.app.log("Pianokey","Up kiya  "+getName());
-        if(this.keyType==Piano.PianoKeyType.BLACK)
-        this.setTexture(new Texture(Constants.BLACK_UP));
-        else
-            this.setTexture(new Texture(Constants.WHITE_UP));
-
+        //Gdx.app.log("Pianokey","Up kiya  "+getTexture());
+        this.setTexture(upTexture);
         setIsPressed(false);
     }
 
     void updateTextureDown()
     {
+
         setIsPressed(true);
 
-//        Gdx.app.log("Pianokey","down kiya  "+getName());
-        if(this.keyType == Piano.PianoKeyType.WHITE)
-            this.setTexture(new Texture(Constants.WHITE_DOWN));
-        else
-            this.setTexture(new Texture(Constants.BLACK_DOWN));
+       // Gdx.app.log("Pianokey","down kiya  "+getTexture());
 
+        this.setTexture(downTexture);
+
+    }
+
+    void initKeyTexture() {
+
+        if (keyType == Piano.PianoKeyType.BLACK) {
+            this.texture = new Texture("piano/black_up.png");
+            this.upTexture = new Texture("piano/black_up.png");
+            this.downTexture = FallingNotesScreen.getTheme().getBlackKeyDownTexture();
+
+        } else {
+            this.texture = new Texture("piano/white_up.png");
+            this.upTexture = new Texture("piano/white_up.png");
+            this.downTexture = FallingNotesScreen.getTheme().getWhiteKeyDownTexture();
+
+
+        }
+        }
     }
 
 
@@ -174,4 +192,5 @@ public class PianoKey {
 
 
 
-}
+
+

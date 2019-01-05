@@ -1,9 +1,13 @@
 package com.techiespace.projects.fallingnotes;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 
 import java.util.ArrayList;
@@ -12,20 +16,22 @@ public class Piano {
 
    static ArrayList<PianoKey[]> whitePianoKeys = new ArrayList<PianoKey[]>();
    static ArrayList<PianoKey[]> blackPianoKeys = new ArrayList<PianoKey[]>();
-
+    BitmapFont font;
 
 
     public Piano()
     {
         initWhiteKeys();
         initBlackKeys();
-
+        Texture texture = new Texture(Gdx.files.internal(FallingNotesScreen.getTheme().getFntPngName()), true); // true enables mipmaps
+        texture.setFilter(Texture.TextureFilter.MipMapLinearNearest, Texture.TextureFilter.Linear); // linear filtering in nearest mipmap image
+        font = new BitmapFont(Gdx.files.internal(FallingNotesScreen.getTheme().getFntFileName()), new TextureRegion(texture), false);
     }
 
     public static PianoKey findKey(String noteName)
     {
 
-        Gdx.app.log("Piano","AAYa "+noteName);
+//        Gdx.app.log("Piano","AAYa "+noteName);
         if (noteName.charAt(1) == '#') {
             for (PianoKey[] pianokey : blackPianoKeys) {
                 for (int i = 0; i < pianokey.length; i++) {
@@ -68,8 +74,7 @@ public class Piano {
                 keys[j].setPositionInGroup(j);
 
 
-
-                keys[j].setTexture(new Texture(Constants.BLACK_UP));
+                keys[j].initKeyTexture();
 
                 keys[j].setHeight(Constants.BLACK_KEY_HEIGHT);
                 keys[j].setWidth(Constants.BLACK_NOTE_WIDTH);
@@ -104,7 +109,7 @@ public class Piano {
                     }
                 }
 
-                keys[j].setPosition(new Vector2(Note.mapCoordinates(keys[j].getName()),(float)(Constants.WHITE_PIANO_KEY_HEIGHT*0.3f)));
+                keys[j].setPosition(new Vector2(Note.mapCoordinates(keys[j].getName()), Constants.WHITE_PIANO_KEY_HEIGHT * 0.3f + Constants.OFFSET));
 
             }
             blackPianoKeys.add(keys);
@@ -135,7 +140,8 @@ public class Piano {
                 mKeys[j].setIsPressed(false);
 
 
-                mKeys[j].setTexture(new Texture(Constants.WHITE_UP));
+//                mKeys[j].setTexture(new Texture(Constants.WHITE_UP));
+                mKeys[j].initKeyTexture();
 
                 mKeys[j].setHeight(Constants.WHITE_PIANO_KEY_HEIGHT);
                 mKeys[j].setWidth(Constants.NOTES_WIDTH);
@@ -185,7 +191,7 @@ public class Piano {
                         break;
                 }
 
-                mKeys[j].setPosition(new Vector2(Note.mapCoordinates(mKeys[j].getName()), 0));
+                mKeys[j].setPosition(new Vector2(Note.mapCoordinates(mKeys[j].getName()), Constants.OFFSET));
 
             }
             whitePianoKeys.add(mKeys);
@@ -204,12 +210,47 @@ public class Piano {
     }
 
 
-    void render(Sprite sprite, SpriteBatch batch)
-    {
+    void render(Sprite sprite, SpriteBatch batch) {
 
         renderWhiteKeys(sprite,batch);
 
         renderBlackKeys(sprite,batch);
+
+        renderLabel(batch);
+
+        sprite.setPosition(Constants.NOTES_WIDTH * 35, Constants.OFFSET);
+        sprite.setSize(Constants.NOTES_WIDTH, Constants.WHITE_PIANO_KEY_HEIGHT);
+        sprite.setRegion(new Texture(Constants.WHITE_UP));
+        sprite.draw(batch);
+
+
+    }
+
+    private void renderLabel(SpriteBatch batch) {
+        font.setColor(FallingNotesScreen.getTheme().getLabelColor());
+        font.getData().setScale(0.20f);
+
+
+        for(int i = Constants.STARTING_OCTAVE;i<=Constants.ENDING_OCTAVE;i++) {
+            font.draw(batch, "C"+i, Note.mapCoordinates("C"+i) + 2, 15 + Constants.OFFSET);
+            font.draw(batch, "D"+i, Note.mapCoordinates("D"+i) + 2, 15 + Constants.OFFSET);
+            font.draw(batch, "E"+i, Note.mapCoordinates("E"+i) + 2, 15 + Constants.OFFSET);
+            font.draw(batch, "F"+i, Note.mapCoordinates("F"+i) + 2, 15 + Constants.OFFSET);
+            font.draw(batch, "G"+i, Note.mapCoordinates("G"+i) + 2, 15 + Constants.OFFSET);
+            font.draw(batch, "A"+i, Note.mapCoordinates("A"+i) + 2, 15 + Constants.OFFSET);
+            font.draw(batch, "B"+i, Note.mapCoordinates("B"+i) + 2, 15 + Constants.OFFSET);
+
+        }
+
+
+        font.setColor(FallingNotesScreen.getTheme().getGameNameColor());
+        font.getData().setScale(FallingNotesScreen.getTheme().getGameNameScale());
+        final GlyphLayout layout = new GlyphLayout(font,Constants.GAME_NAME);
+        // or for non final texts: layout.setText(font, text);
+        final float fontX = 0 + (Constants.WORLD_WIDTH - layout.width) / 2;
+        final float fontY = 0 + (Constants.WORLD_HEIGHT + layout.height) / 2;
+
+        font.draw(batch, Constants.GAME_NAME, fontX, Constants.OFFSET - 10);//Constants.NOTES_WIDTH*36/2,Constants.OFFSET/2+20);
     }
 
     void renderWhiteKeys(Sprite sprite,SpriteBatch batch)
@@ -223,7 +264,6 @@ public class Piano {
             {
                 keys[j].render(sprite,batch);
             }
-
 
         }
 

@@ -2,7 +2,6 @@ package com.techiespace.projects.fallingnotes;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.audio.Sound;
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
 import com.techiespace.projects.fallingnotes.pianoHelpers.RoundRectShapeRenderer;
@@ -20,39 +19,52 @@ public class Note implements Comparable<Note> {
     Vector2 velocity;
     Sound sound;
     boolean soundOnce = false;
+    int pressVelocity;
 
-    public Note(int midiNoteNum, int startTime, int endTime) {
+    public Note(int midiNoteNum, int startTime, int endTime, int pressVelocity) {
         this.noteName = getMidiNoteName(midiNoteNum);
         this.position = new Vector2(mapCoordinates(this.noteName), Constants.WORLD_HEIGHT);
         this.velocity = new Vector2(0,-Constants.TEMPO);
         this.startTime = startTime;
         this.endTime = endTime;
-        this.noteLength = (endTime - startTime) * Constants.HEIGTH_MULTIPLIER;
+        this.noteLength = (endTime - startTime) * Constants.HEIGTH_MULTIPLIER / Constants.SPEED;
         this.sound = Gdx.audio.newSound(Gdx.files.internal("audio/" + noteName + ".ogg"));  //TODO: Imp - This causes skewed first note and takes time to start activity.
+        this.pressVelocity = pressVelocity;
+    }
+    public Note(String noteName, int startTime, int endTime) {
+        this.noteName = noteName;
+        this.position = new Vector2(mapCoordinates(this.noteName), Constants.WORLD_HEIGHT);
+        this.velocity = new Vector2(0,-Constants.TEMPO);
+        this.startTime = startTime;
+        this.endTime = endTime;
+        this.noteLength = (endTime - startTime) * Constants.HEIGTH_MULTIPLIER / Constants.SPEED;
+        this.sound = Gdx.audio.newSound(Gdx.files.internal("audio/" + noteName + ".ogg"));  //TODO: Imp - This causes skewed first note and takes time to start activity.
+
     }
 
     public void render(RoundRectShapeRenderer renderer) {
         renderer.set(ShapeRenderer.ShapeType.Filled);
+        renderer.setColor(153 / 255f, 51 / 255f, 255 / 255f, 1);
         if(noteName.contains("#")){
-            renderer.roundedRect(
+            renderer.roundedRect(renderer,
                     position.x, position.y,
                     Constants.BLACK_NOTE_WIDTH,
                     noteLength, 2,
-                    new Color(153 / 255f, 51 / 255f, 255 / 255f, 1),
-                    new Color(178 / 255f, 102 / 255f, 255 / 255f, 1),
-                    new Color(178 / 255f, 102 / 255f, 255 / 255f, 1),
-                    new Color(153 / 255f, 51 / 255f, 255 / 255f, 1)
+                    FallingNotesScreen.getTheme().getLightBlackKeyColor(),
+                    FallingNotesScreen.getTheme().getDarkBlackKeyColor(),
+                    FallingNotesScreen.getTheme().getDarkBlackKeyColor(),
+                    FallingNotesScreen.getTheme().getLightBlackKeyColor()
             );
         }
         else {
-            renderer.roundedRect(
+            renderer.roundedRect(renderer,
                     position.x, position.y,
                     Constants.NOTES_WIDTH,
                     noteLength, 2,
-                    new Color(102 / 255f, 0 / 255f, 204 / 255f, 1),
-                    new Color(127 / 255f, 0 / 255f, 255 / 255f, 1),
-                    new Color(127 / 255f, 0 / 255f, 255 / 255f, 1),
-                    new Color(102 / 255f, 0 / 255f, 204 / 255f, 1)
+                    FallingNotesScreen.getTheme().getLightWhiteKeyColor(),
+                    FallingNotesScreen.getTheme().getDarkWhiteKeyColor(),
+                    FallingNotesScreen.getTheme().getDarkWhiteKeyColor(),
+                    FallingNotesScreen.getTheme().getLightWhiteKeyColor()
             );
         }
     }
